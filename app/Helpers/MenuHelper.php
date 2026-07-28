@@ -13,9 +13,7 @@ class MenuHelper
             [
                 'icon' => 'lucide:home',
                 'name' => 'Dashboard',
-                'subItems' => [
-                    ['name' => 'Ecommerce', 'path' => '/'],
-                ],
+                'path' => '/'
             ],
             [
                 'icon' => 'lucide:grid-3x3',
@@ -63,9 +61,21 @@ class MenuHelper
                     ['icon' => 'lucide:grid-3x3', 'name' => 'Categories', 'path' => '/categories'],
                 ],
             ],
-
-
-
+            [
+                'icon' => 'lucide:shopping-bag',
+                'name' => 'Purchase',
+                'subItems' => [
+                    ['icon' => 'lucide:layout-dashboard', 'name' => 'Purchase Dashboard', 'path' => '/purchase-dashboard'],
+//                    ['icon' => 'lucide:file-plus', 'name' => 'New Purchase Order', 'path' => '/purchase-orders/create'],
+                    ['icon' => 'lucide:clipboard-list', 'name' => 'Purchase Orders', 'path' => '/purchase-orders'],
+//                    ['icon' => 'lucide:check-circle', 'name' => 'Pending Approval', 'path' => '/purchase-orders/pending-approval'],
+                    ['icon' => 'lucide:package-check', 'name' => 'Goods Receipt (GRN)', 'path' => '/goods-receipts'],
+                    ['icon' => 'lucide:rotate-ccw', 'name' => 'Purchase Returns', 'path' => '/purchase-returns'],
+                    ['icon' => 'lucide:receipt', 'name' => 'Purchase Invoices', 'path' => '/purchase-invoices'],
+                    ['icon' => 'lucide:wallet', 'name' => 'Supplier Payments', 'path' => '/supplier-payments'],
+                    ['icon' => 'lucide:alert-triangle', 'name' => 'Expiry Report', 'path' => '/reports/expiry'],
+                ],
+            ],
             [
                 'icon' => 'lucide:astroid',
                 'name' => 'AI Chat',

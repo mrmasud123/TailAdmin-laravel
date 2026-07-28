@@ -13,6 +13,10 @@ class SsoCallbackController extends Controller
 {
     public function callback(Request $request, SsoTokenVerifier $verifier)
     {
+        if ($request->query('sso') === 'none') {
+            return redirect('/login');
+        }
+
         $token = $request->query('token');
 
         if (!$token) {
@@ -25,7 +29,6 @@ class SsoCallbackController extends Controller
             abort(403, 'SSO verification failed: ' . $e->getMessage());
         }
 
-        // Find or auto-provision the user locally
         $user = User::firstOrCreate(
             ['email' => $claims->email],
             [

@@ -89,6 +89,9 @@ class ProductController extends Controller
         return view('admin.products.view-stock', compact('product','title'));
     }
 
+    public function expiryReport() {
+        return view('admin.purchase.reports.expiry');
+    }
     public function data()
     {
         return DataTables::of(

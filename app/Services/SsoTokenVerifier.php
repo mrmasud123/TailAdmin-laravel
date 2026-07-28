@@ -16,7 +16,6 @@ class SsoTokenVerifier
     {
         $publicKey = file_get_contents(config('sso.public_key_path'));
 
-        // Throws on bad signature or expired token automatically
         $decoded = JWT::decode($token, new Key($publicKey, 'RS256'));
 
         if ($decoded->iss !== config('sso.expected_issuer')) {
