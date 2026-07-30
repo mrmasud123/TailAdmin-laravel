@@ -1,7 +1,7 @@
 <?php
 
-test('guest is redirected to login', function () {
+test('guest is redirected to sso silent check', function () {
     $response = $this->get('/');
 
-    $response->assertRedirect('/login');
+    $response->assertRedirect('https://hospital.test/sso/silent-check');
 });
