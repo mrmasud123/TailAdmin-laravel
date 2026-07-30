@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('vendor-scripts')
-    @vite(['resources/assets/js/purchase-orders.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @vite(['resources/assets/js/create-purchase-order.js'])
 @endsection
 
 @section('content')
@@ -18,7 +19,12 @@
             <span class="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300">Draft</span>
         </div>
 
-        <form id="purchase-order-form">
+        <form id="purchase-order-form"
+              action="{{ route('admin.purchase-order.store') }}"
+              method="POST"
+        >
+            @csrf
+
             <!-- Header fields -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
@@ -26,11 +32,14 @@
                     <select class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm" name="supplier_id">
                         <option value="" disabled selected>Select Supplier</option>
                         @forelse($suppliers as $supplier)
-                            <option value="{{$supplier->id}}" {{old('supplier_id', $supplier->id ?? '')}}>{{$supplier->name}}</option>
+                            <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                {{ $supplier->name }}
+                            </option>
                         @empty
                             <option value="" disabled selected>No suppliers found.</option>
                         @endforelse
                     </select>
+                    <p class="text-xs text-red-500 mt-1 js-error" data-field="supplier_id"></p>
                 </div>
                 <div>
                     <label class="text-xs text-gray-500 dark:text-gray-300">Order Date</label>
@@ -41,15 +50,17 @@
                         required
                         placeholder="Select date"
                     />
+                    <p class="text-xs text-red-500 mt-1 js-error" data-field="order_date"></p>
                 </div>
                 <div>
                     <label class="text-xs text-gray-500 dark:text-gray-300">Expected Delivery</label>
                     <x-form.date-picker
-                        id="expected_delivery"
-                        name="expected_delivery"
+                        id="expected_delivery_date"
+                        name="expected_delivery_date"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                         placeholder="Select date"
                     />
+                    <p class="text-xs text-red-500 mt-1 js-error" data-field="expected_delivery_date"></p>
                 </div>
             </div>
 
@@ -79,6 +90,7 @@
                     </tbody>
                 </table>
             </div>
+            <p class="text-xs text-red-500 mt-1 js-error" data-field="items"></p>
 
             <!-- Totals + notes -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -86,6 +98,7 @@
                     <label class="text-xs text-gray-500 dark:text-gray-300">Notes</label>
                     <textarea rows="4" name="notes" placeholder="Optional notes for the supplier..."
                               class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm"></textarea>
+                    <input type="hidden" name="action" id="action" value="draft">
                 </div>
                 <div class="flex flex-col items-end justify-end">
                     <div class="w-full max-w-xs space-y-2 text-sm">
@@ -93,9 +106,15 @@
                             <span>Subtotal</span>
                             <span>৳ <span id="po-subtotal">0</span></span>
                         </div>
-                        <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                            <span>Estimated Tax (0%)</span>
-                            <span>৳ 0</span>
+                        <div class="flex justify-between items-center text-gray-500 dark:text-gray-400">
+                            <span>Discount</span>
+                            <input type="number" name="discount_amount" min="0" step="0.01" value="0"
+                                   class="js-discount w-24 text-right px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm">
+                        </div>
+                        <div class="flex justify-between items-center text-gray-500 dark:text-gray-400">
+                            <span>Tax</span>
+                            <input type="number" name="tax_amount" min="0" step="0.01" value="0"
+                                   class="js-tax w-24 text-right px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm">
                         </div>
                         <div class="flex justify-between font-semibold text-gray-800 dark:text-white text-base border-t border-gray-200 dark:border-gray-700 pt-2">
                             <span>Grand Total</span>
@@ -110,10 +129,10 @@
                 <a href="{{ route('admin.purchase-orders.manage') }}" class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5">
                     Cancel
                 </a>
-                <button type="submit" name="action" value="draft" class="px-4 py-2 text-sm font-medium rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10">
+                <button type="submit" name="action" value="draft" class="js-submit-btn px-4 py-2 text-sm font-medium rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10">
                     Save as Draft
                 </button>
-                <button type="submit" name="action" value="send" class="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow">
+                <button type="submit" name="action" value="send" class="js-submit-btn px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow">
                     Save &amp; Send to Supplier
                 </button>
             </div>

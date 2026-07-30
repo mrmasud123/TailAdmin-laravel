@@ -10,6 +10,7 @@ class Transaction extends Model
 {
     protected $fillable = [
         'customer_id',
+        'supplier_id',
         'transactionable_id',
         'transactionable_type',
         'type',
@@ -40,6 +41,10 @@ class Transaction extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 
     public function getSignedAmountAttribute(): float
