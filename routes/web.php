@@ -34,7 +34,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback'])->name('auth.google.callback');
 
-Route::middleware([TrySsoSilentLogin::class])->group(function () {
+//Route::middleware([TrySsoSilentLogin::class])->group(function () {
     Route::get('/', function () {
         if (!auth()->check()) {
             return redirect('/login');
@@ -42,7 +42,7 @@ Route::middleware([TrySsoSilentLogin::class])->group(function () {
 
         return view('pages.dashboard.ecommerce');
     })->name('dashboard');
-});
+//});
 
 Route::middleware(['auth:web'])->group(function () {
     Route::get('/online-users', [AdminController::class, 'onlineUsers'])->name('admin.online-users');
